@@ -2,9 +2,7 @@ package exb
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
-	"log"
 	"time"
 )
 
@@ -31,40 +29,18 @@ type Order struct {
 	TradesCount     int       `json:"trades_count"`
 }
 
-//Список всех сделок
-func (ex *Keys) GetOrders() Orders {
-	req := ex.PrivateRequest("https://www.exbitron.com", nil, "/api/v2/peatio/market/orders")
-	var res Orders
-	_ = json.Unmarshal(req.([]uint8), &res)
-	return res
-}
-
 // GetOpenOrders - получение списка открытых ордеров
 func (ex *Keys) GetOpenOrders(market string) ([]Order, error) {
-	openOrders, err := ex.PR("https://www.exbitron.com", nil, "/api/v2/peatio/market/orders")
-	if err != nil {
-		return nil, errors.New("не удалось получить открытые ордера: " + err.Error())
+	params := map[string]string{
+		"market": market,
+		"state":  "wait",
 	}
-
-	/*
-		openOrders, err := api.Client.NewListOpenOrdersService().Symbol(pair).Do(context.Background())
-		if err != nil {
-			return nil, errors.New("не удалось получить открытые ордера: " + err.Error())
-		}
-	*/
-	//log.Printf("RESA: %v", openOrders)
-
-	for _, order := range openOrders {
-		//if order.State == "wait" {
-		log.Printf("IDы: %v Магаз3333333: %v Объеб монет: %v", order.ID, order.Market, order.OriginVolume)
-		//}
-	}
-
-	formattedOpenOrders := make([]Order, len(openOrders))
-
-	for index, order := range openOrders {
+	req := ex.PrivateRequest("https://www.exbitron.com", params, "/api/v2/peatio/market/orders", "Любая хуйня если хотим отправить ГЕТ")
+	var res []*Order
+	_ = json.Unmarshal(req.([]uint8), &res)
+	formattedOpenOrders := make([]Order, len(res))
+	for index, order := range res {
 		formattedOpenOrders[index] = *order
-		//formattedOpenOrders[index] = formatOrder(*order)
 	}
 
 	return formattedOpenOrders, nil

@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func (ex *Keys) PrivateRequest(u string, params map[string]string, query string) interface{} {
+func (ex *Keys) PR_OLD(u string, params map[string]string, query string) interface{} {
 
 	postBody, err := json.Marshal(params)
 	if err != nil {
@@ -68,7 +68,7 @@ func (ex *Keys) PrivateRequest(u string, params map[string]string, query string)
 	return body
 }
 
-func (ex *Keys) PR(u string, params map[string]string, query string) (res []*Order, err error) {
+func (ex *Keys) PrivateRequest(u string, params map[string]string, query string, get ...string) interface{} {
 
 	postBody, err := json.Marshal(params)
 	if err != nil {
@@ -83,11 +83,17 @@ func (ex *Keys) PR(u string, params map[string]string, query string) (res []*Ord
 	sig.Write([]byte(message))
 
 	signhash := hex.EncodeToString(sig.Sum(nil))
+
 	req, err := http.NewRequest("POST", u+query, bytes.NewBuffer(postBody))
-	if params == nil {
+	if get != nil {
 		req, err = http.NewRequest("GET", u+query, nil)
 		q := req.URL.Query()
-		q.Add("market", "avnusdt")
+		for papam, val := range params {
+			if papam != "typereq" {
+				q.Add(papam, val)
+			}
+		}
+
 		req.URL.RawQuery = q.Encode()
 	}
 	if err != nil {
@@ -124,10 +130,10 @@ func (ex *Keys) PR(u string, params map[string]string, query string) (res []*Ord
 		}
 	}
 
-	res = make([]*Order, 0)
-	err = json.Unmarshal(body, &res)
-	if err != nil {
-		return []*Order{}, err
-	}
-	return res, nil
+	//res = make([]*Order, 0)
+	//err = json.Unmarshal(body, &res)
+	//if err != nil {
+	//	return []*Order{}, err
+	//}
+	return body
 }
