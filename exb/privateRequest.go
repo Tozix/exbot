@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-func (ex *Keys) PR_OLD(u string, params map[string]string, query string) interface{} {
+func (ex *Keys) FirstR(u string, params map[string]string, query string, get ...string) interface{} {
 
 	postBody, err := json.Marshal(params)
 	if err != nil {
@@ -28,20 +28,27 @@ func (ex *Keys) PR_OLD(u string, params map[string]string, query string) interfa
 	sig.Write([]byte(message))
 
 	signhash := hex.EncodeToString(sig.Sum(nil))
+
 	req, err := http.NewRequest("POST", u+query, bytes.NewBuffer(postBody))
-	if params == nil {
+	if get != nil {
 		req, err = http.NewRequest("GET", u+query, nil)
+		q := req.URL.Query()
+		for papam, val := range params {
+			q.Add(papam, val)
+		}
+
+		req.URL.RawQuery = q.Encode()
 	}
 	if err != nil {
 		log.Println(err.Error())
 	}
-	// if you appending to existing query this works fine
 
 	req.Header.Set("X-Auth-Apikey", ex.PublicKey)
 	req.Header.Set("X-Auth-Nonce", nonce)
 	req.Header.Set("X-Auth-Signature", signhash)
 	req.Header.Set("content-Type", "application/json")
 
+	log.Println(req.URL.String())
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
 		log.Println(err.Error())
@@ -51,20 +58,12 @@ func (ex *Keys) PR_OLD(u string, params map[string]string, query string) interfa
 	log.Println("response Status:", resp.Status)
 	body, _ := ioutil.ReadAll(resp.Body)
 	log.Println("response Body:", string(body))
-	if resp.StatusCode >= http.StatusBadRequest {
-		var m interface{}
-		e := json.Unmarshal(body, &m)
-		if e != nil {
-			log.Printf("failed to unmarshal json: %s", e)
-		}
-		targets := m.(map[string]interface{})
-		for i, t := range targets {
-			if i == "errors" {
-				log.Printf("Ошибка: %s", t)
-			}
-		}
-	}
 
+	//res = make([]*Order, 0)
+	//err = json.Unmarshal(body, &res)
+	//if err != nil {
+	//	return []*Order{}, err
+	//}
 	return body
 }
 
@@ -89,9 +88,7 @@ func (ex *Keys) PrivateRequest(u string, params map[string]string, query string,
 		req, err = http.NewRequest("GET", u+query, nil)
 		q := req.URL.Query()
 		for papam, val := range params {
-			if papam != "typereq" {
-				q.Add(papam, val)
-			}
+			q.Add(papam, val)
 		}
 
 		req.URL.RawQuery = q.Encode()

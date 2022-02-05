@@ -17,8 +17,8 @@ func main() {
 		log.Fatalln("Какая-то херня: " + err.Error())
 	}
 	//Доступный баланс
-	//balance := trade.Balance("avn").Balance
-	//log.Println("Баланс монеты:" + balance)
+	balance := trade.Balance("avn").Balance
+	log.Println("Баланс монеты:" + balance)
 
 	//trades := trade.SellOrder("avnusdt", 11000.0, 0.0011)
 	//cancel := trade.CancelOrders("avnusdt")
@@ -33,6 +33,11 @@ func main() {
 		log.Printf("IDы: %v Магаз: %v Объеб монет: %v", order.ID, order.Market, order.OriginVolume)
 		//	}
 	}
+	//tickers := trade.GetTicker("avnusdt").Ticker
+	//log.Println(tickers.PriceChangePercent)
+	//tickers :=
+	trade.GetAllTickers()
+	//log.Println(tickers)
 
 	/*
 		adr := trade.GetAddress(config.Dex.Quote_asset).Available

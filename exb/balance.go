@@ -11,7 +11,7 @@ type Balance struct {
 
 func (to *Keys) Balance(currency string) Balance {
 
-	req := to.PrivateRequest("https://www.exbitron.com", nil, "/api/v2/peatio/account/balances/"+currency)
+	req := to.PrivateRequest("https://www.exbitron.com", nil, "/api/v2/peatio/account/balances/"+currency, "GET")
 	var res Balance
 	_ = json.Unmarshal(req.([]uint8), &res)
 	return res
