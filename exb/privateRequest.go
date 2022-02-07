@@ -55,9 +55,9 @@ func (ex *Keys) FirstR(u string, params map[string]string, query string, get ...
 	}
 	defer resp.Body.Close()
 
-	log.Println("response Status:", resp.Status)
+	//log.Println("response Status:", resp.Status)
 	body, _ := ioutil.ReadAll(resp.Body)
-	log.Println("response Body:", string(body))
+	//log.Println("response Body:", string(body))
 
 	//res = make([]*Order, 0)
 	//err = json.Unmarshal(body, &res)

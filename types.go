@@ -10,10 +10,11 @@ type (
 		Quote_asset string  `json:"quote_asset"`
 		Coin        string  `json:"coin"`
 		Sell_up     float64 `json:"sell_up"`
+		Min_volume  int     `json:"min_volume"`
 	}
 
 	// Config - настройки
 	Config struct {
-		Exb Exb `json:"Dex"`
+		Exb Exb `json:"Exb"`
 	}
 )

@@ -2,11 +2,13 @@ package exb
 
 import (
 	"encoding/json"
+	"strings"
 )
 
 type Tickers struct {
-	Market string
-	Ticker
+	Pair               string
+	Volume             int
+	PriceChangePercent int
 }
 
 type Ticker struct {
@@ -26,39 +28,22 @@ type Ticker struct {
 }
 
 func (to *Keys) GetTicker(market string) Ticker {
-
 	req := to.PrivateRequest("https://www.exbitron.com", nil, "/api/v2/peatio/public/markets/"+market+"/tickers", "GET")
 	var res Ticker
 	_ = json.Unmarshal(req.([]uint8), &res)
 	//log.Printf("Тикер: %s", res)
 	return res
 }
-func (to *Keys) GetAllTickers() {
-
+func (to *Keys) GetAllTickers(quote_asset string) []Tickers {
 	req := to.FirstR("https://www.exbitron.com", nil, "/api/v2/peatio/public/markets/tickers", "GET")
-
-	//var res Tickers
 	var res map[string]Ticker
-	var tickers Tickers
 	_ = json.Unmarshal(req.([]uint8), &res)
-	for market, ticker := range res {
-		//if order.State == "wait" {
-		tickers.Market = market
-		tickers.Ticker = ticker
-		//log.Printf("Market: %v Value: %v", market, ticker.Ticker.High)
-		//	}
-	}
-
-	/*
-		var res []*Ticker
-		_ = json.Unmarshal(req.([]uint8), &res)
-		formatTickers := make([]Ticker, len(res))
-		log.Println(res)
-		for index, ticker := range res {
-			formatTickers[index] = *ticker
-			log.Printf("Индекс: %v Значение: %v", index, ticker)
+	var items []Tickers
+	for pair, ticker := range res {
+		if strings.Contains(pair, quote_asset) {
+			items = append(items, formatTickers(pair, ticker))
 		}
-	*/
+	}
+	return items
 
-	//return formatTickers
 }
