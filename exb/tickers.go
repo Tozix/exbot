@@ -35,7 +35,7 @@ func (to *Keys) GetTicker(market string) Ticker {
 	return res
 }
 func (to *Keys) GetAllTickers(quote_asset string) []Tickers {
-	req := to.FirstR("https://www.exbitron.com", nil, "/api/v2/peatio/public/markets/tickers", "GET")
+	req := to.PrivateRequest("https://www.exbitron.com", nil, "/api/v2/peatio/public/markets/tickers", "GET")
 	var res map[string]Ticker
 	_ = json.Unmarshal(req.([]uint8), &res)
 	var items []Tickers

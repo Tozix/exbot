@@ -35,6 +35,7 @@ func (ex *Keys) GetOpenOrders(market string) ([]Order, error) {
 		"market": market,
 		"state":  "wait",
 	}
+	params = nil
 	req := ex.PrivateRequest("https://www.exbitron.com", params, "/api/v2/peatio/market/orders", "Любая хуйня если хотим отправить ГЕТ")
 	var res []*Order
 	_ = json.Unmarshal(req.([]uint8), &res)

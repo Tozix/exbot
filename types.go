@@ -1,8 +1,6 @@
 package main
 
 type (
-
-	// Binance - настройки Binance
 	Exb struct {
 		Key         string  `json:"key"`
 		Secret      string  `json:"secret"`
@@ -13,8 +11,16 @@ type (
 		Min_volume  int     `json:"min_volume"`
 	}
 
+	MySQL struct {
+		Host string `json:"host_db"`
+		Name string `json:"name_db"`
+		User string `json:"user_db"`
+		Pass string `json:"pass_db"`
+	}
+
 	// Config - настройки
 	Config struct {
-		Exb Exb `json:"Exb"`
+		Exb   Exb   `json:"Exb"`
+		MySQL MySQL `json:"MySQL"`
 	}
 )

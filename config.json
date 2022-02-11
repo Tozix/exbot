@@ -7,5 +7,11 @@
       "coin": "avn",
       "sell_up": 2.0,
       "min_volume": 500
+    },
+   "MySQL": {
+      "host_db": "ts5.boostnet.ru",
+      "name_db": "exbot",
+      "user_db": "exbot",
+      "pass_db": "1JU6nqG7)Q/6OtRk"
     }
   }  

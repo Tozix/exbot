@@ -2,7 +2,10 @@ package main
 
 import (
 	"exbot/exb"
+	"exbot/mysql"
 	"log"
+
+	_ "github.com/go-sql-driver/mysql"
 )
 
 /* АЛгоритм */
@@ -29,9 +32,15 @@ func main() {
 	if err != nil {
 		log.Fatalln("Какая-то херня: " + err.Error())
 	}
+	db, err := mysql.NewSql(config.MySQL.User, config.MySQL.Pass, config.MySQL.Host, config.MySQL.Name)
+	if err != nil {
+		log.Fatalln("Какая-то херня: " + err.Error())
+	}
+	defer db.DB.Close()
+
 	//Доступный баланс
-	balance := trade.Balance("avn").Balance
-	log.Println("Баланс монеты:" + balance)
+	//balance := trade.Balance("avn").Balance
+	//log.Println("Баланс монеты:" + balance)
 
 	//trades := trade.SellOrder("avnusdt", 11000.0, 0.0011)
 	//cancel := trade.CancelOrders("avnusdt")
@@ -43,21 +52,23 @@ func main() {
 
 	for _, order := range orders {
 		//if order.State == "wait" {
-		log.Printf("IDы: %v Магаз: %v Объеб монет: %v", order.ID, order.Market, order.OriginVolume)
+		log.Printf("IDы: %v", order)
 		//	}
+	}
+	//Заносим в нашу базу
+	for _, order := range orders {
+		_, err := db.InsertOrder(order, "orders")
+		if err != nil {
+			panic(err)
+		}
 	}
 
 	//log.Println(tickers.PriceChangePercent)
-	tickers := trade.GetAllTickers(config.Exb.Quote_asset)
-	for _, ticker := range tickers {
-		if ticker.Volume > config.Exb.Min_volume {
-			log.Printf("Пара: %s Объем торгов: %d Изменение цены: %d", ticker.Pair, ticker.Volume, ticker.PriceChangePercent)
-		}
-	}
-	//log.Println(tickers)
+	//tickers := trade.GetAllTickers(config.Exb.Quote_asset)
+	//for _, ticker := range tickers {
+	//	if ticker.Volume > config.Exb.Min_volume {
+	//		log.Printf("Пара: %s Объем торгов: %d Изменение цены: %d", ticker.Pair, ticker.Volume, ticker.PriceChangePercent)
+	//	}
+	//}
 
-	/*
-		adr := trade.GetAddress(config.Dex.Quote_asset).Available
-		log.Println(adr)
-	*/
 }
