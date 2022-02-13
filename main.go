@@ -39,8 +39,8 @@ func main() {
 	defer db.DB.Close()
 
 	//Доступный баланс
-	//balance := trade.Balance("avn").Balance
-	//log.Println("Баланс монеты:" + balance)
+	quote_asset_balance := trade.Balance(config.Exb.Quote_asset).Balance
+	log.Println("Доступный баланс для закупа:" + quote_asset_balance)
 
 	//trades := trade.SellOrder("avnusdt", 11000.0, 0.0011)
 	//cancel := trade.CancelOrders("avnusdt")
@@ -50,17 +50,52 @@ func main() {
 		log.Fatalln("Какая-то херня: " + err.Error())
 	}
 
-	for _, order := range orders {
-		//if order.State == "wait" {
-		log.Printf("IDы: %v", order)
-		//	}
-	}
 	//Заносим в нашу базу
 	for _, order := range orders {
+		log.Printf("IDы: %v", order)
 		_, err := db.InsertOrder(order, "orders")
 		if err != nil {
 			panic(err)
 		}
+	}
+
+	rows, err := db.OrdersList("orders")
+	if err != nil {
+		panic(err.Error())
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var db_order exb.Order
+		err = rows.Scan(&db_order.ID,
+			&db_order.UUID,
+			&db_order.Side,
+			&db_order.OrdType,
+			&db_order.Price,
+			&db_order.AvgPrice,
+			&db_order.State,
+			&db_order.Market,
+			&db_order.MarketType,
+			&db_order.CreatedAt,
+			&db_order.UpdatedAt,
+			&db_order.OriginVolume,
+			&db_order.RemainingVolume,
+			&db_order.ExecutedVolume,
+			&db_order.MakerFee,
+			&db_order.TakerFee,
+			&db_order.TradesCount)
+		if err != nil {
+			panic(err.Error())
+		}
+		//log.Printf(db_order.UUID)
+		order := trade.GetOrder(exb.IntToString(db_order.ID))
+		if db_order.State == "wait" && db_order.Side == "sell" {
+			//Если статус ждет, запрашиваем текущую цену по этой моменте
+			ticker := trade.GetTicker(order.Market).Ticker
+			log.Printf("Прайс в ордере: %v", order.Price)
+			log.Printf("Last: %s", ticker.Last)
+			log.Printf("Изменение цены: %d", exb.PriceChangePercent(order.Price, ticker.Last))
+		}
+
 	}
 
 	//log.Println(tickers.PriceChangePercent)

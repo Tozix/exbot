@@ -35,7 +35,6 @@ func (ex *Keys) GetOpenOrders(market string) ([]Order, error) {
 		"market": market,
 		"state":  "wait",
 	}
-	params = nil
 	req := ex.PrivateRequest("https://www.exbitron.com", params, "/api/v2/peatio/market/orders", "Любая хуйня если хотим отправить ГЕТ")
 	var res []*Order
 	_ = json.Unmarshal(req.([]uint8), &res)
@@ -45,6 +44,12 @@ func (ex *Keys) GetOpenOrders(market string) ([]Order, error) {
 	}
 
 	return formattedOpenOrders, nil
+}
+func (ex *Keys) GetOrder(ID string) Order {
+	req := ex.PrivateRequest("https://www.exbitron.com", nil, "/api/v2/peatio/market/orders/"+ID, "GET")
+	var res Order
+	_ = json.Unmarshal(req.([]uint8), &res)
+	return res
 }
 
 //Разместить ордер на продажу
@@ -76,10 +81,7 @@ func (ex *Keys) CancelOrders(market string) Orders {
 
 //Убрать сделку по ID
 func (ex *Keys) CancelOrder(ID string) Order {
-	params := map[string]string{
-		"id": ID,
-	}
-	req := ex.PrivateRequest("https://www.exbitron.com", params, "/api/v2/peatio/market/orders/"+ID+"/cancel")
+	req := ex.PrivateRequest("https://www.exbitron.com", nil, "/api/v2/peatio/market/orders/"+ID+"/cancel", "GET")
 	var res Order
 	_ = json.Unmarshal(req.([]uint8), &res)
 	return res

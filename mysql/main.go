@@ -9,7 +9,7 @@ import (
 )
 
 func NewSql(User string, Pass string, Host string, Name string) (*Sql, error) {
-	db, err := sql.Open("mysql", User+":"+Pass+"@tcp("+Host+":3306)/"+Name)
+	db, err := sql.Open("mysql", User+":"+Pass+"@tcp("+Host+":3306)/"+Name+"?parseTime=true")
 	checkError(err)
 	//defer db.Close()
 
@@ -32,7 +32,7 @@ func (s *Sql) InsertOrder(order exb.Order, table string) (int, error) {
 	// Ниже будет SQL запрос, который мы хотим выполнить. Мы разделили его на две строки
 	// для удобства чтения (поэтому он окружен обратными кавычками
 	// вместо обычных двойных кавычек).
-	stmt := "insert ignore into " + table + "(ID,UUID,Side,OrdType,Price,AvgPrice,State,Market,MarketType,CreatedAt,UpdatedAt,OriginVolume) values (?,?,?,?,?,?,?,?,?,?,?,?)"
+	stmt := "insert ignore into " + table + "(ID,UUID,Side,OrdType,Price,AvgPrice,State,Market,MarketType,CreatedAt,UpdatedAt,OriginVolume,RemainingVolume,ExecutedVolume,MakerFee,TakerFee,TradesCount) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
 
 	// Используем метод Exec() из встроенного пула подключений для выполнения
 	// запроса. Первый параметр это сам SQL запрос, за которым следует
@@ -51,7 +51,13 @@ func (s *Sql) InsertOrder(order exb.Order, table string) (int, error) {
 		order.MarketType,
 		order.CreatedAt,
 		order.UpdatedAt,
-		order.OriginVolume)
+		order.OriginVolume,
+		order.RemainingVolume,
+		order.ExecutedVolume,
+		order.MakerFee,
+		order.TakerFee,
+		order.TradesCount,
+	)
 	if err != nil {
 		return 0, err
 	}

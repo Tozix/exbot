@@ -42,3 +42,13 @@ func formatTickers(pair string, ticker Ticker) Tickers {
 		PriceChangePercent: pricechangepercent,
 	}
 }
+func IntToString(n int) string {
+	str := strconv.Itoa(n)
+	return str
+}
+func PriceChangePercent(order_price string, market_price string) int {
+	o := StringToFloat(order_price)
+	m := StringToFloat(market_price)
+	change := m/o*100 - 100
+	return int(change)
+}

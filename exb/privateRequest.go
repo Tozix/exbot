@@ -55,7 +55,7 @@ func (ex *Keys) PrivateRequest(u string, params map[string]string, query string,
 	req.Header.Set("X-Auth-Signature", signhash)
 	req.Header.Set("content-Type", "application/json")
 
-	log.Println(req.URL.String())
+	//log.Println(req.URL.String())
 
 	resp, err := http.DefaultClient.Do(req)
 	if err != nil {
